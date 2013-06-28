@@ -25,7 +25,7 @@ public class ClientMain {
 	private static void init(){
 		Properties p=new Properties();
 		try {
-			p.load(new FileInputStream("client_config.txt"));
+			p.load(new FileInputStream("client_info.txt"));
 		}  catch (IOException e) {
 			System.out.println("IOException!");
 			System.exit(0);

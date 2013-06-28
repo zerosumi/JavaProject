@@ -9,31 +9,32 @@ import chatsys.dao.hibernate.ServiceDaoImHbn;
 import chatsys.entity.OnlineUser;
 import chatsys.entity.User;
 
-
 public class ServerMainClass {
 	public static IServiceDao userDao;
-	public static Map<User,OnlineUser> userMap;
-	public static Properties pro;
-	public static void init(){
-		pro=new Properties();
+	public static Map<User, OnlineUser> userMap;
+	public static Properties prop;
+
+	public static void init() {
+		prop = new Properties();
 		try {
-			pro.load(new FileInputStream("server_config.txt"));
-		}catch (IOException e) {
+			prop.load(new FileInputStream("server_info.txt"));
+		} catch (IOException e) {
 			System.out.println("IOException!");
 			e.printStackTrace();
 		}
-		userDao=new ServiceDaoImHbn();
-		userMap=new HashMap<User,OnlineUser> ();
+		userDao = new ServiceDaoImHbn();
+		userMap = new HashMap<User, OnlineUser>();
 	}
-	
+
 	public static void main(String[] args) {
 		init();
-		ServerSocket ss=null;
-		Socket s=null;
+		ServerSocket ss = null;
+		Socket s = null;
 		try {
-			ss=new ServerSocket(Integer.parseInt(pro.getProperty("ServerPort")));
-			while(true){
-				s=ss.accept();
+			ss = new ServerSocket(Integer.parseInt(prop
+					.getProperty("ServerPort")));
+			while (true) {
+				s = ss.accept();
 				new ServerThread(s).start();
 			}
 		} catch (IOException e) {

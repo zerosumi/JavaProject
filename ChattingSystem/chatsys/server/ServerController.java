@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.*;
+import java.nio.channels.*;
 
 import chatsys.dao.hibernate.IServiceDao;
 import chatsys.entity.*;
@@ -17,6 +18,10 @@ public class ServerController {
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
 	private OnlineUser onlineUser;
+	
+	//new nio
+	private SocketChannel ch;
+	private Selector sel;
 	
 	public ServerController(Socket s) {
 		super();
