@@ -3,6 +3,6 @@ Online Chatting System
 
 This program works in Windows
 
-Linux/Unix have diff socket strategy and error will occur
+Linux has diff socket strategy and occurs wired error
 
-Will replace OOS/OIS by NIO later
+Will fix few days later
