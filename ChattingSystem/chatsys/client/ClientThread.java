@@ -18,6 +18,7 @@ import chatsys.client.windows.PrivateChatWindow;
 import chatsys.entity.Message;
 import chatsys.entity.RequestType;
 import chatsys.entity.Response;
+import chatsys.entity.ResponseType;
 import chatsys.entity.User;
 
 
@@ -57,24 +58,24 @@ public class ClientThread extends Thread{
 			try {
 				//Thread.sleep(1000);
 				Response res=(Response)ois.readObject();
-				
+				//ois.read();
 				if(res!=null){
-					RequestType type=res.getType();
-					if(type.equals(RequestType.ONLINE)){
+					ResponseType type=res.getType();
+					if(type.equals(ResponseType.ONLINE)){
 						onlineHandle(res);
-					}else if(type.equals(RequestType.OFFLINE)){
+					}else if(type.equals(ResponseType.OFFLINE)){
 						offlineHandle(res);
-					}else if(type.equals(RequestType.CHANGEINFO)){
+					}else if(type.equals(ResponseType.CHANGEINFO)){
 						changeInfoHandle(res);
-					}else if(type.equals(RequestType.MODIFYPWD)){
+					}else if(type.equals(ResponseType.MODIFYPWD)){
 						modifyPWDHandle(res);
-					}else if(type.equals(RequestType.RECVMESSAGE)){
+					}else if(type.equals(ResponseType.RECVMESSAGE)){
 						receiveMessageHandle(res);
-					}else if(type.equals(RequestType.PRIVATECHAT)){
+					}else if(type.equals(ResponseType.PRIVATECHAT)){
 						privateChatHandle(res);
-					}else if(type.equals(RequestType.RECVFILE)){
+					}else if(type.equals(ResponseType.RECVFILE)){
 						receiveFileHandle(res);
-					}else if(type.equals(RequestType.PUBLICANNO)){
+					}else if(type.equals(ResponseType.PUBLICANNO)){
 						publicAnnoHandle(res);
 					}
 				}

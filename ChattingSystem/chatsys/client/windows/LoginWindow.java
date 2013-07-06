@@ -60,7 +60,7 @@ public class LoginWindow extends JFrame {
 				Request req=new Request(RequestType.REGISTER);
 				try {
 					ClientMain.oos.writeObject(req);
-					ClientMain.oos.write(1);
+					//ClientMain.oos.write(1);
 					ClientMain.oos.flush();
 					User user=(User)ClientMain.ois.readObject();
 					if(user!=null){
@@ -103,18 +103,18 @@ public class LoginWindow extends JFrame {
 				req.setData("id",id);
 				req.setData("pwd",pwd);
 				ClientMain.oos.writeObject(req);
-				ClientMain.oos.write(1);
+				//ClientMain.oos.write(1);
 				ClientMain.oos.flush();
 				Response res=(Response)ClientMain.ois.readObject();
 				User user=(User)res.getData();
-				if(res.getType().equals(RequestType.ISONLINE)){
+				if(res.getType().equals(ResponseType.ISONLINE)){
 					JOptionPane.showMessageDialog(this,"This user is online!");
-				}else if(user!=null&&res.getType().equals(RequestType.ONLINE)){
+				}else if(user!=null&&res.getType().equals(ResponseType.ONLINE)){
 					ClientMain.currentUser=user;
-					int n=ClientMain.ois.read();
-					for(int i=0;i<n;i++){
-						ClientMain.onlineUsers.add((User)ClientMain.ois.readObject());
-					}
+//					int n=ClientMain.ois.read();
+//					for(int i=0;i<n;i++){
+//						ClientMain.onlineUsers.add((User)ClientMain.ois.readObject());
+//					}
 					this.dispose();
 					new ClientMainWindow().showMe();
 				}else{

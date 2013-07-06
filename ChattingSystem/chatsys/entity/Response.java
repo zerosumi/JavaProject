@@ -7,10 +7,10 @@ public class Response implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = -7864926537127631729L;
-	private RequestType type;
+	private ResponseType type;
 	private Serializable value;
 	
-	public Response(RequestType type){
+	public Response(ResponseType type){
 		this.type=type;
 	}
 	public void setData(Serializable value){
@@ -19,7 +19,7 @@ public class Response implements Serializable{
 	public Serializable getData(){
 		return value;
 	}
-	public RequestType getType(){
+	public ResponseType getType(){
 		return type;
 	}
 }

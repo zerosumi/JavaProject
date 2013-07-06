@@ -108,8 +108,8 @@ public class ClientMainWindow extends JFrame implements ActionListener{
 				req.setData(message);
 				ClientMain.oos.writeObject(req);
 				ClientMain.oos.flush();
-				//ClientMainClass.oos.writeObject(new Request(RequestType.sendMessage));
-				//ClientMainClass.oos.writeObject(message);
+				//ClientMain.oos.writeObject(new Request(RequestType.SENDMESSAGE));
+				//ClientMain.oos.writeObject(message);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -146,7 +146,7 @@ public class ClientMainWindow extends JFrame implements ActionListener{
 				Request req=new Request(RequestType.OFFLINE);
 				ClientMain.oos.writeObject(req);
 				ClientMain.oos.flush();
-   				System.exit(0);	
+   				System.exit(0);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}

@@ -1,5 +1,6 @@
 package chatsys.server;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -25,38 +26,45 @@ public class ServerController {
 	
 	public ServerController(Socket s) {
 		super();
-		dao=ServerMainClass.userDao;
+		dao=ServerMain.userDao;
 		this.s = s;
 	}
 	 
 	public void handle() throws Exception {
-		ois=new ObjectInputStream(s.getInputStream());
+		//oos=new ObjectOutputStream(s.getOutputStream());
+		ois=new ObjectInputStream(new BufferedInputStream(s.getInputStream()));
 		oos=new ObjectOutputStream(s.getOutputStream());
 		onlineUser=new OnlineUser(ois,oos);
 		while(true){
-			Request req=(Request)ois.readObject();
-			ois.read();
-			RequestType type=req.getType();
-			if(type.equals(RequestType.EXIT)){
-				exitHandle();
-				break;
-			}else if(type.equals(RequestType.LOGIN)){
-				loginHandle(req);
-			}else if(type.equals(RequestType.REGISTER)){
-				registerHandle();
-			}else if(type.equals(RequestType.OFFLINE)){
-				offlineHandle();
-				break;
-			}else if(type.equals(RequestType.CHANGEINFO)){
-				changeInformationHandle();
-			}else if(type.equals(RequestType.MODIFYPWD)){
-				modifypasswdHandle(req);
-			}else if(type.equals(RequestType.SENDMESSAGE)){
-				sendMessageHandle(req);
-			}else if(type.equals(RequestType.RECVFILE)){
-				receiveFileHandle(req);
-			}else if(type.equals(RequestType.SENDFILE)){
-				sendFileHandle(req);
+			try{
+				Request req=(Request)ois.readObject();
+				//ois.read();
+				if(req!=null){
+					RequestType type=req.getType();
+					if(type.equals(RequestType.EXIT)){
+						exitHandle();
+						break;
+					}else if(type.equals(RequestType.LOGIN)){
+						loginHandle(req);
+					}else if(type.equals(RequestType.REGISTER)){
+						registerHandle();
+					}else if(type.equals(RequestType.OFFLINE)){
+						offlineHandle();
+						break;
+					}else if(type.equals(RequestType.CHANGEINFO)){
+						changeInformationHandle();
+					}else if(type.equals(RequestType.MODIFYPWD)){
+						modifypasswdHandle(req);
+					}else if(type.equals(RequestType.SENDMESSAGE)){
+						sendMessageHandle(req);
+					}else if(type.equals(RequestType.RECVFILE)){
+						receiveFileHandle(req);
+					}else if(type.equals(RequestType.SENDFILE)){
+						sendFileHandle(req);
+					}
+				}
+			}catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -146,12 +154,12 @@ public class ServerController {
 			Response res1=new Response(RequestType.PRIVATECHAT);
 			res1.setData(message);
 			ObjectOutputStream o=null;
-			Set<User>set=ServerMainClass.userMap.keySet();
+			Set<User>set=ServerMain.userMap.keySet();
 			Iterator it=set.iterator();
 			while(it.hasNext()){
 				User u=(User)it.next();
 				if(u.equals(to)){
-					o=ServerMainClass.userMap.get(u).getOos();
+					o=ServerMain.userMap.get(u).getOos();
 					break;
 				}				
 			}
@@ -167,7 +175,7 @@ public class ServerController {
 	
 	private void offlineHandle() {
 		try {
-			ServerMainClass.userMap.remove(user);
+			ServerMain.userMap.remove(user);
 			Response res=new Response(RequestType.OFFLINE);
 			res.setData(user);
 			sendToAllUser(res);
@@ -178,6 +186,7 @@ public class ServerController {
 	}
 
 	private void registerHandle() {
+		//will improve later
 		User user=dao.addUser();
 		try {
 			oos.writeObject(user);
@@ -194,7 +203,7 @@ public class ServerController {
 		user=dao.getUser(id,pwd);
 		Response res;
 		try {
-			Set<User>users=ServerMainClass.userMap.keySet();
+			Set<User>users=ServerMain.userMap.keySet();
 			Iterator iter=users.iterator();
 			while(iter.hasNext()){
 				User u=(User)iter.next();
@@ -211,7 +220,7 @@ public class ServerController {
 			oos.flush();
 
 			if(user!=null){
-				Set<User>set=ServerMainClass.userMap.keySet();
+				Set<User>set=ServerMain.userMap.keySet();
 				oos.write(set.size());
 				Iterator it=set.iterator();
 				while(it.hasNext()){
@@ -219,7 +228,7 @@ public class ServerController {
 				}
 				oos.flush();
 				sendToAllUser(res);
-				ServerMainClass.userMap.put(user, onlineUser);
+				ServerMain.userMap.put(user, onlineUser);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -228,12 +237,13 @@ public class ServerController {
 
 	private void sendToAllUser(Response res){
 		try {
-			 Collection c= ServerMainClass.userMap.values();
+			Collection c= ServerMain.userMap.values();
 			Iterator it=c.iterator();
 			while(it.hasNext()){
 				ObjectOutputStream o=((OnlineUser)it.next()).getOos();
 				o.writeObject(res);
 				o.flush();
+				o.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
