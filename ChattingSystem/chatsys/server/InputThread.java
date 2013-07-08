@@ -6,11 +6,11 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import chatsys.dao.hibernate.IServiceDao;
 import chatsys.entity.Message;
-import chatsys.entity.OnlineUser;
 import chatsys.entity.Request;
 import chatsys.entity.RequestType;
 import chatsys.entity.Response;
@@ -19,7 +19,7 @@ import chatsys.entity.User;
 
 public class InputThread extends Thread { 
 	private User user;
-	private OnlineUser onlineUser;
+	//private OnlineUser onlineUser;
     private Socket socket;
     private OutputThread out;
     private OutputThreadMap map;
@@ -251,49 +251,56 @@ public class InputThread extends Thread {
 		
 	
 	private void sendMessageHandle(Request req) {
-		Response res=new Response(ResponseType.RECVMESSAGE);
-		Message message=null;
-//		try {
-			message=(Message)req.getData();
-//			message=(Message)ois.readObject();
-//			message=req.g
-			res.setData(message);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} catch (ClassNotFoundException e) {
-//			e.printStackTrace();
-//		}
+		
+		Message message=(Message)req.getData();
 		User to=message.getTo();
+		
+		//public
 		if(to==null){
+			Response res=new Response(ResponseType.PUBLICMESSAGE);
+			res.setData(message);
+			out.setMessage(res);
 			sendToAllUser(res);
-		}else{
+		}
+		//private
+		else{
 			
-			Response res1=new Response(ResponseType.PRIVATECHAT);
-			res1.setData(message);
-			ObjectOutputStream o=null;
-			Set<User>set=ServerMain.userMap.keySet();
-			Iterator it=set.iterator();
-			while(it.hasNext()){
-				User u=(User)it.next();
-				if(u.equals(to)){
-					o=ServerMain.userMap.get(u).getOos();
-					break;
-				}				
-			}
-			try {
-				o.writeObject(res1);
-				o.flush();
-			
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			Response res=new Response(ResponseType.PRIVATEMESSAGE);
+			//res1.setData(message);
+			//ObjectOutputStream o=null;
+			//Set<User>set=ServerMain.userMap.keySet();
+			//Iterator it=set.iterator();
+			OutputThread toOut = map.getById(to.getId());  
+	          if (toOut != null) {// 如果用户在线  
+	        	  res.setData(message);
+	              toOut.setMessage(res);  
+	          } else {// 如果为空，说明用户已经下线,回复用户
+	              StringBuffer text = new StringBuffer("User is not online");
+	              message.setMessage(text);
+	              res.setData(message);
+	              out.setMessage(res);
+	          }  
+//			while(it.hasNext()){
+//				User u=(User)it.next();
+//				if(u.equals(to)){
+//					o=ServerMain.userMap.get(u).getOos();
+//					break;
+//				}				
+//			}
+//			try {
+//				o.writeObject(res1);
+//				o.flush();
+//			
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
 		}
 	}
 	
 	private void offlineHandle() {
 		try {
-			ServerMain.userMap.remove(user);
-			map.remove(user);
+			//ServerMain.userMap.remove(user);
+			map.remove(user.getId());
 			Response res=new Response(ResponseType.OFFLINE);
 			res.setData(user);
 			sendToAllUser(res);
@@ -315,56 +322,69 @@ public class InputThread extends Thread {
 	}
 	
 	private void loginHandle(Request req) throws IOException {
-		Long id=Long.parseLong((String)req.getData("id"));
-		String pwd=(String)req.getData("pwd");
-		user=dao.getUser(id,pwd);
+		Long id = Long.parseLong((String) req.getData("id"));
+		String pwd = (String) req.getData("pwd");
+		user = dao.getUser(id, pwd);
 		Response res;
-		Set<User>users=ServerMain.userMap.keySet();
-		Iterator iter=users.iterator();
-		while(iter.hasNext()){
-			User u=(User)iter.next();
-			if(u.equals(user)){
-				res=new Response(ResponseType.ISONLINE);
-				out.setMessage(res);
-				//oos.writeObject(res);
-				//oos.flush();
-				return;
-			}				
-		}
-		res=new Response(ResponseType.ONLINE);
-		res.setData(user);
-		out.setMessage(res);
-		//oos.writeObject(res);
-		//oos.flush();
+		// //Set<User>users=ServerMain.userMap.keySet();
+		// map.
+		// Iterator iter=users.iterator();
+		// while(iter.hasNext()){
+		// User u=(User)iter.next();
+		// if(u.equals(user)){
+		// res=new Response(ResponseType.ISONLINE);
+		// out.setMessage(res);
+		// //oos.writeObject(res);
+		// //oos.flush();
+		// return;
+		// }
+		// }
 
-		if(user!=null){
-			Set<User>set=ServerMain.userMap.keySet();
-			//oos.write(set.size());
-			Iterator<User> it=set.iterator();
-			while(it.hasNext()){
-				Response res1=new Response(ResponseType.OFFLINE);
-				out.setMessage(res1);
-				//oos.writeObject(it.next());
-			}
-			//oos.flush();
+		// oos.writeObject(res);
+		// oos.flush();
+
+		if (user != null) {
+			// Set<User>set=ServerMain.userMap.keySet();
+			// oos.write(set.size());
+			// Iterator<User> it=set.iterator();
+			// while(it.hasNext()){
+			// Response res1=new Response(ResponseType.OFFLINE);
+			// out.setMessage(res1);
+			// oos.writeObject(it.next());
+			res=new Response(ResponseType.LOGINSUCCESS);
+			res.setData(user);
+			out.setMessage(res);
+			map.add(user.getId(), out);
+			res=new Response(ResponseType.ONLINE);
+			res.setData(user);
 			sendToAllUser(res);
-			ServerMain.userMap.put(user,onlineUser);
-			map.add(user, out);
 		}
+		else {
+			res=new Response(ResponseType.ISONLINE);
+			out.setMessage(res);
+		}
+		// oos.flush();
+		//sendToAllUser(res);
+		// ServerMain.userMap.put(user,onlineUser);
+		
 	}
 
 	private void sendToAllUser(Response res){
-		try {
-			Collection c= ServerMain.userMap.values();
-			Iterator it=c.iterator();
-			while(it.hasNext()){
-				ObjectOutputStream o=((OnlineUser)it.next()).getOos();
-				o.writeObject(res);
-				o.flush();
-				o.close();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+//		try {
+//			Collection c= ServerMain.userMap.values();
+//			Iterator it=c.iterator();
+//			while(it.hasNext()){
+//				ObjectOutputStream o=((OnlineUser)it.next()).getOos();
+//				o.writeObject(res);
+//				o.flush();
+//				o.close();
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		List<OutputThread> list = map.getAll();
+		for(OutputThread o:list) {
+			o.setMessage(res);
 		}
 	}
 }

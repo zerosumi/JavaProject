@@ -8,12 +8,11 @@ import java.util.concurrent.Executors;
 
 import chatsys.dao.hibernate.IServiceDao;
 import chatsys.dao.hibernate.ServiceDaoImHbn;
-import chatsys.entity.OnlineUser;
 import chatsys.entity.User;
 
 public class ServerMain {
 	public static IServiceDao userDao;
-	public static Map<User, OnlineUser> userMap;
+	//public static Map<User, OnlineUser> userMap;
 	public static Properties prop;
 	private ExecutorService executorService;
 	private ServerSocket serverSocket = null;
@@ -21,7 +20,7 @@ public class ServerMain {
 	
 	public ServerMain() {
 		userDao = new ServiceDaoImHbn();
-		userMap = new HashMap<User, OnlineUser>();
+		//userMap = new HashMap<User, OnlineUser>();
 		try {  
             executorService = Executors.newFixedThreadPool(Runtime.getRuntime()  
                     .availableProcessors() * 50);
