@@ -259,7 +259,7 @@ public class InputThread extends Thread {
 		if(to==null){
 			Response res=new Response(ResponseType.PUBLICMESSAGE);
 			res.setData(message);
-			out.setMessage(res);
+			//out.setMessage(res);
 			sendToAllUser(res);
 		}
 		//private
@@ -355,9 +355,9 @@ public class InputThread extends Thread {
 			res.setData(user);
 			out.setMessage(res);
 			map.add(user.getId(), out);
-			res=new Response(ResponseType.ONLINE);
-			res.setData(user);
-			sendToAllUser(res);
+			//res=new Response(ResponseType.ONLINE);
+			//res.setData(user);
+			//sendToAllUser(res);
 		}
 		else {
 			res=new Response(ResponseType.ISONLINE);

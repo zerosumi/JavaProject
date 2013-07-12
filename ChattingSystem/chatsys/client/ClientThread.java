@@ -69,9 +69,9 @@ public class ClientThread extends Thread{
 						changeInfoHandle(res);
 					}else if(type.equals(ResponseType.MODIFYPWD)){
 						modifyPWDHandle(res);
-					}else if(type.equals(ResponseType.RECVMESSAGE)){
+					}else if(type.equals(ResponseType.PUBLICMESSAGE)){
 						receiveMessageHandle(res);
-					}else if(type.equals(ResponseType.PRIVATECHAT)){
+					}else if(type.equals(ResponseType.PRIVATEMESSAGE)){
 						privateChatHandle(res);
 					}else if(type.equals(ResponseType.RECVFILE)){
 						receiveFileHandle(res);

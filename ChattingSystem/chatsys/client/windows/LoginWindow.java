@@ -109,7 +109,7 @@ public class LoginWindow extends JFrame {
 				User user=(User)res.getData();
 				if(res.getType().equals(ResponseType.ISONLINE)){
 					JOptionPane.showMessageDialog(this,"This user is online!");
-				}else if(user!=null&&res.getType().equals(ResponseType.ONLINE)){
+				}else if(user!=null&&res.getType().equals(ResponseType.LOGINSUCCESS)){
 					ClientMain.currentUser=user;
 //					int n=ClientMain.ois.read();
 //					for(int i=0;i<n;i++){
