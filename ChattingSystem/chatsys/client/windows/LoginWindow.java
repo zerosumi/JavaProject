@@ -42,16 +42,16 @@ public class LoginWindow extends JFrame {
 	}
 	
 	private void addHanderListener(){
-		login.getBtnCancer().addActionListener(new ActionListener(){
+		login.getBtnCancel().addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				loginArea.getNameField().setText("");
 				loginArea.getPwdField().setText("");
 			}
 		});
 		
-		login.getBtnLoad().addActionListener(new ActionListener(){
+		login.getBtnLogin().addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				load(loginArea.getNameField().getText().trim(),new String(loginArea.getPwdField().getPassword()).trim());
+				login(loginArea.getNameField().getText().trim(),new String(loginArea.getPwdField().getPassword()).trim());
 			}
 		});
 		
@@ -90,7 +90,7 @@ public class LoginWindow extends JFrame {
 		});
 	}
 	
-	private void load(String id,String pwd){
+	private void login(String id,String pwd){
 		if(id.equals("")){
 			JOptionPane.showMessageDialog(null,"Please input username");
 			loginArea.getNameField().requestFocusInWindow();
@@ -116,7 +116,9 @@ public class LoginWindow extends JFrame {
 //						ClientMain.onlineUsers.add((User)ClientMain.ois.readObject());
 //					}
 					this.dispose();
-					new ClientMainWindow().showMe();
+					ClientMainWindow mainWindow = new ClientMainWindow();
+					mainWindow.showMe();
+					ClientMain.getClientInputThread().setMainWindow(mainWindow);
 				}else{
 					JOptionPane.showMessageDialog(this,"Incorrect password!");
 				}

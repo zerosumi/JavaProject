@@ -30,11 +30,11 @@ public class LoginPanel extends JPanel {
 		this.add(btnCancer);
 	}
 
-	public JButton getBtnCancer() {
+	public JButton getBtnCancel() {
 		return btnCancer;
 	}
 
-	public JButton getBtnLoad() {
+	public JButton getBtnLogin() {
 		return btnLoad;
 	}
 

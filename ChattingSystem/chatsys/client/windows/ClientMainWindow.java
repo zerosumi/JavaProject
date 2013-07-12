@@ -40,14 +40,25 @@ public class ClientMainWindow extends JFrame implements ActionListener{
 		this.publicInfoPanel = new PublicAnnoPanel();
 		this.userListPanel=new UserListPanel();
 		this.recordArea=new MessageHistoryArea();
-		new ClientThread(receivedmessageArea.getTextPane(),recordArea.getTextPane(),
-										publicInfoPanel.getTextpane(),userListPanel)
-										.start();
+//		new ClientThread(receivedmessageArea.getTextPane(),recordArea.getTextPane(),
+//										publicInfoPanel.getTextpane(),userListPanel)
+//										.start();
 		init();
 		addHanderListener();
 		sendingMessageArea.getTextPane().requestFocusInWindow();
 	}
-
+	public JTextPane getPublicAnno() {
+		return publicInfoPanel.getTextpane();
+	}
+	public JTextPane getTextArea() {
+		return receivedmessageArea.getTextPane();
+	}
+	public UserListPanel getUserList() {
+		return userListPanel;
+	}
+	public JTextPane getHistory() {
+		return recordArea.getTextPane();
+	}
 	public void init(){
 		Container container = this.getContentPane();
 		JPanel leftPanel = new JPanel();  
@@ -103,16 +114,14 @@ public class ClientMainWindow extends JFrame implements ActionListener{
 			Message message=new Message(sendingMessageArea.getTextPane().getParagraphAttributes());
 			message.setMessage(root);
 			message.setFrom(ClientMain.currentUser);
-			try {
-				Request req = new Request(RequestType.SENDMESSAGE);
-				req.setData(message);
-				ClientMain.oos.writeObject(req);
-				ClientMain.oos.flush();
-				//ClientMain.oos.writeObject(new Request(RequestType.SENDMESSAGE));
-				//ClientMain.oos.writeObject(message);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			
+			Request req = new Request(RequestType.SENDMESSAGE);
+			req.setData(message);
+			ClientMain.getClientOutputThread().setMsg(req);
+			//ClientMain.oos.writeObject(req);
+			//ClientMain.oos.flush();
+			//ClientMain.oos.writeObject(new Request(RequestType.SENDMESSAGE));
+			//ClientMain.oos.writeObject(message);
 			sendingMessageArea.getTextPane().setText("");
 		}else if(e.getActionCommand().equals("Close")){
 			closeWindow();
@@ -144,8 +153,9 @@ public class ClientMainWindow extends JFrame implements ActionListener{
 		if(select==JOptionPane.YES_OPTION){
 			try {
 				Request req=new Request(RequestType.OFFLINE);
-				ClientMain.oos.writeObject(req);
-				ClientMain.oos.flush();
+				ClientMain.getClientOutputThread().setMsg(req);
+				//ClientMain.oos.writeObject(req);
+				//ClientMain.oos.flush();
    				System.exit(0);
 			} catch (Exception e1) {
 				e1.printStackTrace();
